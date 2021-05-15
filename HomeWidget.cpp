@@ -79,7 +79,7 @@ void HomeWidget::ReplyFinished()
 //					RainValues.append("040|18:05");
 					rainDataChart->SetRainData(RainValues);
 			rainDataChart->update();
-		}
+        }
 		replyRaindata->deleteLater();
     }
 }

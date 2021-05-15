@@ -5,6 +5,9 @@
 #include <QtNetwork/qnetworkaccessmanager.h>
 #include <QtNetwork/qnetworkreply.h>
 #include <QTimer>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 namespace Ui {
 	class TFCWidget;
@@ -27,6 +30,9 @@ private:
 private slots :
 	void UpdateTFC();
 	void ReplyFinished();
+    void PrintOutShitters(QJsonArray memberArray);
+    void JohnAlert();
+    void CoastClear();
 };
 
 #endif // TFCWIDGET_H
