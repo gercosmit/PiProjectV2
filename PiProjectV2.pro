@@ -14,6 +14,7 @@ SOURCES += \
     RainDataChart.cpp \
     SonosWidget.cpp \
     TFCWidget.cpp \
+    discordserver.cpp \
     main.cpp
 
 HEADERS += \
@@ -21,7 +22,8 @@ HEADERS += \
     MainWindow.h \
     RainDataChart.h \
     SonosWidget.h \
-    TFCWidget.h
+    TFCWidget.h \
+    discordserver.h
 
 FORMS += \
     HomeWidget.ui \

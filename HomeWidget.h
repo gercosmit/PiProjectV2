@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QMovie>
 #include <QBuffer>
+#include <QMutex>
 #include "RainDataChart.h"
 
 namespace Ui {
@@ -31,12 +32,12 @@ private:
 	QByteArray *ba;
 	QBuffer *data;
 	QMovie *gif;
+    QMutex networkReplyMutex;
 	
 private slots:
     void UpdateTime();
-	void UpdateRain();
-	void ReplyFinished();
-	
+    void GetRainData();
+    void ReplyFinished();
 };
 
 #endif // HOMEWIDGET_H

@@ -43,7 +43,7 @@ void RainDataChart::paintEvent(QPaintEvent *e)
 				}
 				auto timeValue = rainDataPoint.at(1);
 				int barHeight = (height() - 2 * margin) * rainValue / 255;
-				painter.fillRect(margin + alignShift + barWidth * barIndex, height() - margin - barHeight, barWidth - 2, barHeight, QColor (0, 255-barHeight, 255));
+                painter.fillRect(margin + alignShift + barWidth * barIndex, height() - margin - barHeight, barWidth - 2, barHeight, QColor (0, 255-rainValue, 255));
 				painter.fillRect(margin + alignShift + barWidth * barIndex, margin, barWidth - 2, height() - 2 * margin - barHeight, QColor(100,100,100));
 				barIndex++;
 			}

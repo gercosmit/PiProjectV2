@@ -21,8 +21,10 @@
     <widget class="QLabel" name="label_3">
      <property name="font">
       <font>
-       <family>Times New Roman</family>
-       <pointsize>24</pointsize>
+       <family>Ubuntu</family>
+       <pointsize>32</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
       </font>
      </property>
      <property name="styleSheet">

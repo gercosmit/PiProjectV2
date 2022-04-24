@@ -8,6 +8,7 @@ TFCWidget::TFCWidget(QWidget *parent)
 	, ui(new Ui::TFCWidget)
 {
 	ui->setupUi(this);
+    ui->tsViewer->setFont(QFont("Arial", 16));
 
 	manager = new QNetworkAccessManager(this);
 	connect(manager, &QNetworkAccessManager::finished, this, &TFCWidget::ReplyFinished);
@@ -15,8 +16,6 @@ TFCWidget::TFCWidget(QWidget *parent)
 	timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(UpdateTFC()));
     timer->start(10000);
-
-    ui->tsViewer->setFont(QFont("Arial", 16));
 }
 
 TFCWidget::~TFCWidget()
@@ -26,34 +25,46 @@ TFCWidget::~TFCWidget()
 
 void TFCWidget::UpdateTFC()
 {
-    //JohnAlert();
-    //CoastClear();
+    networkReplyMutex.lock();
     reply = manager->get(QNetworkRequest(QUrl("https://discord.com/api/guilds/728951156927365222/widget.json")));
+    networkReplyMutex.unlock();
 }
 
 void TFCWidget::ReplyFinished()
 {
+    networkReplyMutex.lock();
     if (reply)
     {
         if (reply->error() == QNetworkReply::NoError)
         {
-            QString discordInfoRawString(reply->readAll());
-            QJsonObject discordInfo;
-            QJsonDocument doc = QJsonDocument::fromJson(discordInfoRawString.toUtf8());
-            if(!doc.isNull())
-            {
-                if(doc.isObject())
-                {
-                    ui->tsViewer->clear();
-                    discordInfo = doc.object();
-                    int amountOfShitters = discordInfo.value("presence_count").toInt(0);
-                    ui->tsViewer->append(QString("There are %1 shitters online").arg(amountOfShitters));
+            //QString discordInfoRawString(reply->readAll());
 
-                    QJsonArray memberArray = discordInfo["members"].toArray();
-                    PrintOutShitters(memberArray);
-                }
+            QString discordInfoRawString;
+            while (!reply->atEnd())
+            {
+                discordInfoRawString.append(reply->read(1024));
             }
 
+            if (!discordInfoRawString.isEmpty())
+            {
+                QJsonObject discordInfo;
+                QJsonDocument doc = QJsonDocument::fromJson(discordInfoRawString.toUtf8());
+                if(!doc.isNull())
+                {
+                    if(doc.isObject())
+                    {
+                        ui->tsViewer->clear();
+                        discordInfo = doc.object();
+
+                        if (!discordInfo["channels"].isNull() && !discordInfo["members"].isNull())
+                        {
+                            auto discordServer = DiscordServer(discordInfo["channels"].toArray(), discordInfo["members"].toArray());
+                            PrintOutChannels(discordServer);
+                            CheckForJohn(discordInfo["members"].toArray());
+                        }
+                    }
+                }
+            }
 
         }
         else
@@ -64,16 +75,17 @@ void TFCWidget::ReplyFinished()
         }
         reply->deleteLater();
     }
+    networkReplyMutex.unlock();
 }
 
-void TFCWidget::PrintOutShitters(QJsonArray memberArray)
+void TFCWidget::CheckForJohn(QJsonArray memberArray)
 {
     bool johnDetected = false;
     for (int memberIndex = 0; memberIndex < memberArray.size(); ++memberIndex)
     {
         QJsonObject member = memberArray[memberIndex].toObject();
         auto username = member["username"].toString();
-        ui->tsViewer->append(username);
+
         if (username.compare("SlackAlice") == 0)
         {
           johnDetected = true;
@@ -89,6 +101,22 @@ void TFCWidget::PrintOutShitters(QJsonArray memberArray)
     }
 }
 
+void TFCWidget::PrintOutChannels(DiscordServer discordServer)
+{
+    for (auto &channel : discordServer.channels)
+    {
+        if (channel.Size() > 0)
+        {
+            ui->tsViewer->setFontPointSize(32);
+            ui->tsViewer->append(channel.name);
+            ui->tsViewer->setFontPointSize(16);
+            for (auto &user : channel.users)
+            {
+                ui->tsViewer->append(user.username);
+            }
+        }
+    }
+}
 
 void TFCWidget::JohnAlert()
 {

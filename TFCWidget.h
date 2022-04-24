@@ -8,6 +8,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QMutex>
+#include "discordserver.h"
 
 namespace Ui {
 	class TFCWidget;
@@ -26,11 +28,13 @@ private:
 	QTimer *timer;
 	QNetworkAccessManager* manager;
 	QNetworkReply* reply;
+    QMutex networkReplyMutex;
 	
 private slots :
 	void UpdateTFC();
 	void ReplyFinished();
-    void PrintOutShitters(QJsonArray memberArray);
+    void CheckForJohn(QJsonArray memberArray);
+    void PrintOutChannels(DiscordServer discordServer);
     void JohnAlert();
     void CoastClear();
 };

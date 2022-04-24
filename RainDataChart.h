@@ -13,6 +13,7 @@ class RainDataChart : public QWidget
 	
 	void SetRainData(QStringList rainData)
 	{
+
 		this->rainData = rainData;
 	}
 	

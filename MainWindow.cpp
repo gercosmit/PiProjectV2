@@ -17,6 +17,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->stackedWidget->insertWidget(2, sonosWidget);
 	
 	ui->stackedWidget->setCurrentIndex((int)widget::home);
+
+    //ui->btn_home->setStyleSheet(QString::fromUtf8("background-image: url(/home/gerco/Downloads/home.png);"));
 }
 
 MainWindow::~MainWindow()
