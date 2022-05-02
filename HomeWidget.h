@@ -19,19 +19,14 @@ class HomeWidget : public QWidget
     Q_OBJECT
     
 public:
-    explicit HomeWidget(QWidget *parent = 0);
+    explicit HomeWidget(QNetworkAccessManager* manager, QWidget *parent = 0);
 	~HomeWidget();
 	
 private:
 	Ui::HomeWidget *ui;
 	QTimer *timer;
-	QNetworkAccessManager *manager;
-	QNetworkReply *replyRaindata;
-	QNetworkReply *replyRadar;
-	RainDataChart *rainDataChart;
-	QByteArray *ba;
-	QBuffer *data;
-	QMovie *gif;
+    QNetworkAccessManager *manager;
+    RainDataChart *rainDataChart;
     QMutex networkReplyMutex;
 	
 private slots:

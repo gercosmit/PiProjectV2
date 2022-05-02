@@ -20,19 +20,18 @@ class TFCWidget : public QWidget
 	Q_OBJECT
     
 public :
-	explicit TFCWidget(QWidget *parent = 0);
+    explicit TFCWidget(QNetworkAccessManager* manager, QWidget *parent = 0);
 	~TFCWidget();
 	
 private:
 	Ui::TFCWidget *ui;
 	QTimer *timer;
-	QNetworkAccessManager* manager;
-	QNetworkReply* reply;
+    QNetworkAccessManager* manager;
     QMutex networkReplyMutex;
 	
 private slots :
 	void UpdateTFC();
-	void ReplyFinished();
+    void ReplyFinished();
     void CheckForJohn(QJsonArray memberArray);
     void PrintOutChannels(DiscordServer discordServer);
     void JohnAlert();

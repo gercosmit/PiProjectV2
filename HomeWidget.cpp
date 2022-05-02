@@ -2,9 +2,10 @@
 #include "ui_HomeWidget.h"
 
 
-HomeWidget::HomeWidget(QWidget *parent)
-	: QWidget(parent)
-	, ui(new Ui::HomeWidget),
+HomeWidget::HomeWidget(QNetworkAccessManager* manager, QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::HomeWidget),
+    manager(manager),
 	rainDataChart(new RainDataChart(this))
 {
 	ui->setupUi(this);
@@ -14,9 +15,7 @@ HomeWidget::HomeWidget(QWidget *parent)
 	timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(UpdateTime()));
 	timer->start(500);
-	
-	manager = new QNetworkAccessManager(this);
-	connect(manager, &QNetworkAccessManager::finished, this, &HomeWidget::ReplyFinished);
+
     GetRainData();
 	timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(GetRainData()));
@@ -39,23 +38,25 @@ void HomeWidget::UpdateTime()
 void HomeWidget::GetRainData()
 {
     networkReplyMutex.lock();
-    replyRaindata = manager->get(QNetworkRequest(QUrl("https://br-gpsgadget.azurewebsites.net/data/raintext/?lat=52.29&lon=5.63")));
+    QNetworkReply *reply = manager->get(QNetworkRequest(QUrl("https://br-gpsgadget.azurewebsites.net/data/raintext/?lat=52.29&lon=5.63")));
+    connect(reply, &QNetworkReply::finished, this, &HomeWidget::ReplyFinished);
     networkReplyMutex.unlock();
 }
 
 void HomeWidget::ReplyFinished()
 {
     networkReplyMutex.lock();
-	if (replyRaindata)
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    if (reply)
 	{
-		if (replyRaindata->error() == QNetworkReply::NoError)
+        if (reply->error() == QNetworkReply::NoError)
 		{
             //QString RainValuesRaw(replyRaindata->readAll());
 
             QString RainValuesRaw;
-            while (!replyRaindata->atEnd())
+            while (!reply->atEnd())
             {
-                RainValuesRaw.append(replyRaindata->read(1024));
+                RainValuesRaw.append(reply->read(1024));
             }
 
             QStringList RainValues = RainValuesRaw.split(QRegExp("\\n"));
@@ -65,7 +66,7 @@ void HomeWidget::ReplyFinished()
                 rainDataChart->update();
             }
         }
-		replyRaindata->deleteLater();
+        reply->deleteLater();
     }
     networkReplyMutex.unlock();
 }

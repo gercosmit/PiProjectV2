@@ -13,28 +13,26 @@ DiscordServer::DiscordServer(QJsonArray channelArray, QJsonArray memberArray)
 
 void DiscordServer::CreateChannels(QJsonArray channelArray)
 {
-    for (int channelIndex = 0; channelIndex < channelArray.size(); ++channelIndex)
+    for (auto channel : channelArray)
     {
-        QJsonObject channel = channelArray[channelIndex].toObject();
-        if (!channel["id"].isNull() && !channel["name"].isNull())
+        if (!channel.toObject()["id"].isNull() && !channel.toObject()["name"].isNull())
         {
-            channels.append(DiscordChannel(channel["id"].toString(), channel["name"].toString()));
+            channels.append(DiscordChannel(channel.toObject()["id"].toString(), channel.toObject()["name"].toString()));
         }
     }
 }
 
 void DiscordServer::FillChannels(QJsonArray memberArray)
 {
-    for (int memberIndex = 0; memberIndex < memberArray.size(); ++memberIndex)
+    for (auto member : memberArray)
     {
-        QJsonObject member = memberArray[memberIndex].toObject();
-        if (!member["username"].isNull() && !member["channel_id"].isNull() && !member["status"].isNull())
+        if (!member.toObject()["username"].isNull() && !member.toObject()["channel_id"].isNull() && !member.toObject()["status"].isNull())
         {
             for (auto &channel : channels)
             {
-                if (channel.id == member["channel_id"].toString())
+                if (channel.id == member.toObject()["channel_id"].toString())
                 {
-                    channel.AddUser(DiscordUser(member["username"].toString(), member["status"].toString()));
+                    channel.AddUser(DiscordUser(member.toObject()["username"].toString(), member.toObject()["status"].toString()));
                 }
             }
         }

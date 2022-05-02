@@ -3,15 +3,14 @@
 #include <QGraphicsEllipseItem>
 
 
-TFCWidget::TFCWidget(QWidget *parent)
-	: QWidget(parent)
-	, ui(new Ui::TFCWidget)
+TFCWidget::TFCWidget(QNetworkAccessManager* manager, QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::TFCWidget),
+    manager(manager)
 {
 	ui->setupUi(this);
     ui->tsViewer->setFont(QFont("Arial", 16));
 
-	manager = new QNetworkAccessManager(this);
-	connect(manager, &QNetworkAccessManager::finished, this, &TFCWidget::ReplyFinished);
 	UpdateTFC();
 	timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(UpdateTFC()));
@@ -26,13 +25,15 @@ TFCWidget::~TFCWidget()
 void TFCWidget::UpdateTFC()
 {
     networkReplyMutex.lock();
-    reply = manager->get(QNetworkRequest(QUrl("https://discord.com/api/guilds/728951156927365222/widget.json")));
+    QNetworkReply *reply = manager->get(QNetworkRequest(QUrl("https://discord.com/api/guilds/728951156927365222/widget.json")));
+    connect(reply, &QNetworkReply::finished, this, &TFCWidget::ReplyFinished);
     networkReplyMutex.unlock();
 }
 
 void TFCWidget::ReplyFinished()
 {
     networkReplyMutex.lock();
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (reply)
     {
         if (reply->error() == QNetworkReply::NoError)
@@ -81,10 +82,9 @@ void TFCWidget::ReplyFinished()
 void TFCWidget::CheckForJohn(QJsonArray memberArray)
 {
     bool johnDetected = false;
-    for (int memberIndex = 0; memberIndex < memberArray.size(); ++memberIndex)
+    for (auto member : memberArray)
     {
-        QJsonObject member = memberArray[memberIndex].toObject();
-        auto username = member["username"].toString();
+        auto username = member.toObject()["username"].toString();
 
         if (username.compare("SlackAlice") == 0)
         {

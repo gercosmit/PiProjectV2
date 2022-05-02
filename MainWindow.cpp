@@ -5,8 +5,9 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-	homeWidget(new HomeWidget(this)),
-	tfcWidget(new TFCWidget(this)),
+    manager(this),
+    homeWidget(new HomeWidget(&manager, this)),
+    tfcWidget(new TFCWidget(&manager, this)),
 	sonosWidget(new SonosWidget(this))
 {
     ui->setupUi(this);

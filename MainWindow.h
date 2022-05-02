@@ -33,6 +33,7 @@ protected slots:
 
 private:
     Ui::MainWindow *ui;
+    QNetworkAccessManager manager;
 	HomeWidget* homeWidget;
 	TFCWidget* tfcWidget;
 	SonosWidget* sonosWidget;
