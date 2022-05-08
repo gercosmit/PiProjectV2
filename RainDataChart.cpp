@@ -17,6 +17,7 @@ RainDataChart::~RainDataChart()
 
 void RainDataChart::paintEvent(QPaintEvent *e)
 {
+    rainDataMutex.lock();
 	QPainter painter(this);
 	
 	painter.fillRect(margin, margin, width() - 2 * margin, height() - 2 * margin, backgroundColor);
@@ -49,4 +50,5 @@ void RainDataChart::paintEvent(QPaintEvent *e)
 			}
 		}
 	}
+    rainDataMutex.unlock();
 }

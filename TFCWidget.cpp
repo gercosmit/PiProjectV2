@@ -24,27 +24,18 @@ TFCWidget::~TFCWidget()
 
 void TFCWidget::UpdateTFC()
 {
-    networkReplyMutex.lock();
     QNetworkReply *reply = manager->get(QNetworkRequest(QUrl("https://discord.com/api/guilds/728951156927365222/widget.json")));
     connect(reply, &QNetworkReply::finished, this, &TFCWidget::ReplyFinished);
-    networkReplyMutex.unlock();
 }
 
 void TFCWidget::ReplyFinished()
 {
-    networkReplyMutex.lock();
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (reply)
     {
         if (reply->error() == QNetworkReply::NoError)
         {
-            //QString discordInfoRawString(reply->readAll());
-
-            QString discordInfoRawString;
-            while (!reply->atEnd())
-            {
-                discordInfoRawString.append(reply->read(1024));
-            }
+            QString discordInfoRawString(reply->readAll());
 
             if (!discordInfoRawString.isEmpty())
             {
@@ -76,7 +67,6 @@ void TFCWidget::ReplyFinished()
         }
         reply->deleteLater();
     }
-    networkReplyMutex.unlock();
 }
 
 void TFCWidget::CheckForJohn(QJsonArray memberArray)

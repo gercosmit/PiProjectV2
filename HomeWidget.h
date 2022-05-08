@@ -2,8 +2,8 @@
 #define HOMEWIDGET_H
 
 #include <QWidget>
-#include <QtNetwork/qnetworkaccessmanager.h>
-#include <QtNetwork/qnetworkreply.h>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QTimer>
 #include <QMovie>
 #include <QBuffer>
@@ -24,10 +24,10 @@ public:
 	
 private:
 	Ui::HomeWidget *ui;
-	QTimer *timer;
+    QTimer *timerTime;
+    QTimer *timerWeather;
     QNetworkAccessManager *manager;
     RainDataChart *rainDataChart;
-    QMutex networkReplyMutex;
 	
 private slots:
     void UpdateTime();

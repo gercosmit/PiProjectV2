@@ -2,13 +2,12 @@
 #define TFCWIDGET_H
 
 #include <QWidget>
-#include <QtNetwork/qnetworkaccessmanager.h>
-#include <QtNetwork/qnetworkreply.h>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QTimer>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QMutex>
 #include "discordserver.h"
 
 namespace Ui {
@@ -27,7 +26,6 @@ private:
 	Ui::TFCWidget *ui;
 	QTimer *timer;
     QNetworkAccessManager* manager;
-    QMutex networkReplyMutex;
 	
 private slots :
 	void UpdateTFC();

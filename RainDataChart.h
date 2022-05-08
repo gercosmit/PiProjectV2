@@ -2,6 +2,7 @@
 #define RAINDATACHART_H
 
 #include <QWidget>
+#include <QMutex>
 
 class RainDataChart : public QWidget
 {
@@ -13,8 +14,9 @@ class RainDataChart : public QWidget
 	
 	void SetRainData(QStringList rainData)
 	{
-
+        rainDataMutex.lock();
 		this->rainData = rainData;
+        rainDataMutex.unlock();
 	}
 	
 protected:
@@ -22,6 +24,7 @@ protected:
 	
 private:
 	QStringList rainData;
+    QMutex rainDataMutex;
 };
 
 #endif // RAINDATACHART_H

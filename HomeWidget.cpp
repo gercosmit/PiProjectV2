@@ -12,14 +12,14 @@ HomeWidget::HomeWidget(QNetworkAccessManager* manager, QWidget *parent) :
     ui->weatherDataLayout->addWidget(rainDataChart);
 
 	UpdateTime();
-	timer = new QTimer(this);
-	connect(timer, SIGNAL(timeout()), this, SLOT(UpdateTime()));
-	timer->start(500);
+    timerTime = new QTimer(this);
+    connect(timerTime, SIGNAL(timeout()), this, SLOT(UpdateTime()));
+    timerTime->start(500);
 
     GetRainData();
-	timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(GetRainData()));
-	timer->start(60000);
+    timerWeather = new QTimer(this);
+    connect(timerWeather, SIGNAL(timeout()), this, SLOT(GetRainData()));
+    timerWeather->start(60000);
 }
 
 HomeWidget::~HomeWidget()
@@ -37,27 +37,18 @@ void HomeWidget::UpdateTime()
 
 void HomeWidget::GetRainData()
 {
-    networkReplyMutex.lock();
     QNetworkReply *reply = manager->get(QNetworkRequest(QUrl("https://br-gpsgadget.azurewebsites.net/data/raintext/?lat=52.29&lon=5.63")));
     connect(reply, &QNetworkReply::finished, this, &HomeWidget::ReplyFinished);
-    networkReplyMutex.unlock();
 }
 
 void HomeWidget::ReplyFinished()
 {
-    networkReplyMutex.lock();
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (reply)
 	{
         if (reply->error() == QNetworkReply::NoError)
 		{
-            //QString RainValuesRaw(replyRaindata->readAll());
-
-            QString RainValuesRaw;
-            while (!reply->atEnd())
-            {
-                RainValuesRaw.append(reply->read(1024));
-            }
+            QString RainValuesRaw(reply->readAll());
 
             QStringList RainValues = RainValuesRaw.split(QRegExp("\\n"));
             if (RainValues.size() > 0)
@@ -68,5 +59,4 @@ void HomeWidget::ReplyFinished()
         }
         reply->deleteLater();
     }
-    networkReplyMutex.unlock();
 }
